@@ -90,6 +90,11 @@ server <- function(input, output, session) {
       return(NULL)
     }
     data$id <- as.character(data$id)
+    orig_length <- nrow(data)
+    data <- data[!duplicated(data$text), ]
+    if (orig_length > nrow(data)) {
+      showNotification(paste0("Removed ", (orig_length - nrow(data)), " duplicate texts from the uploaded dataset.", type = "info"))
+    }
     sharedData$data <- data
   })
   
@@ -104,7 +109,7 @@ server <- function(input, output, session) {
     ids_with_less_than_three <- names(id_counts[id_counts < 3])
     data_to_annotate <- data_to_annotate[data_to_annotate$id %in% ids_with_less_than_three | !(data_to_annotate$id %in% ann$id), ]
     if(nrow(data_to_annotate) > 0) {
-      data_to_annotate$text[1]
+      sample(data_to_annotate$text, 1)
     } else {
       NULL  # Return NULL when no texts are left
     }
